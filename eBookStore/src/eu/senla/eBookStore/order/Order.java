@@ -1,5 +1,6 @@
 package eu.senla.eBookStore.order;
 
+import eu.senla.eBookStore.UI.painter.Painter;
 import eu.senla.eBookStore.bookStore.BookStore;
 import eu.senla.eBookStore.bookWarehouse.BookWarehouse;
 import eu.senla.eBookStore.book.Book;
@@ -7,13 +8,13 @@ import java.time.LocalDate;
 import java.util.Map;
 
 public class Order {
-    private int orderId;
+    private final int orderId;
     private OrderStatus orderStatus;
-    private Map<Book, Integer> mapOfBooksInOrder;
+    private final Map<Book, Integer> mapOfBooksInOrder;
     private LocalDate executionDate;
-    private int totalPrice;
+    private final int totalPrice;
     private boolean isAbilityComplete;
-    private String client;
+    private final String client;
 
     public Order(int orderId, Map<Book, Integer> mapOfBooksInOrder) {
         this.orderId = orderId;
@@ -22,12 +23,7 @@ public class Order {
         this.executionDate = LocalDate.of(2000, 1,1);
         this.totalPrice = setTotalPrice();
         this.client = "Some client";
-        System.out.println("*order* create new order(id " + orderId + "):");
-        for (Map.Entry<Book, Integer> pair: mapOfBooksInOrder.entrySet()
-             ) {
-            System.out.println(" * " + pair.getKey().getTitle() + " - " + pair.getValue() + " pcs"    );
-        }
-        System.out.println("*order* order(id " + orderId + ") was create");
+        Painter.getPainter().showNewOrderInfo(this);
         checkAbilityCompleteAndCreateRequests();
     }
 
@@ -56,10 +52,6 @@ public class Order {
         return totalPrice;
     }
 
-    public void setExecutionDate(LocalDate executionDate) {
-        this.executionDate = executionDate;
-    }
-
     public void completeOrder() {
         checkAbilityComplete();
         if (!isAbilityComplete) {
@@ -81,7 +73,7 @@ public class Order {
         isAbilityComplete = true;
         for (Map.Entry<Book, Integer> pair: mapOfBooksInOrder.entrySet()
         ) {
-            if (pair.getValue() > BookWarehouse.getBookWarehouse().getMapOfBooks().get(pair.getKey())) {
+            if (pair.getValue() > BookWarehouse.getBookWarehouse().getMapOfBooksAndQuantity().get(pair.getKey())) {
                 isAbilityComplete = false;
                 orderStatus = OrderStatus.WAIT;
                 return;
@@ -96,8 +88,8 @@ public class Order {
             if (pair.getKey().getOrderRequest() > 0) {
                 pair.getKey().setOrderRequest(pair.getKey().getOrderRequest() + pair.getValue()); // если в новом заказе есть книга, на которую открыт запрос, то плюсуем к запросу на эту книгу ее кол-во в новом заказе
             }
-            else if (pair.getValue() > BookWarehouse.getBookWarehouse().getMapOfBooks().get(pair.getKey())) {
-                BookStore.getBookStore().createOrderRequest(pair.getKey(), pair.getValue() - BookWarehouse.getBookWarehouse().getMapOfBooks().get(pair.getKey()));
+            else if (pair.getValue() > BookWarehouse.getBookWarehouse().getMapOfBooksAndQuantity().get(pair.getKey())) {
+                BookStore.getBookStore().createOrderRequest(pair.getKey(), pair.getValue() - BookWarehouse.getBookWarehouse().getMapOfBooksAndQuantity().get(pair.getKey()));
             }
         }
     }
@@ -123,10 +115,6 @@ public class Order {
 
     public LocalDate getExecutionDate() {
         return executionDate;
-    }
-
-    public void setOrderId(int orderId) {
-        this.orderId = orderId;
     }
 
     public void setOrderStatus(OrderStatus orderStatus) {

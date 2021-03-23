@@ -2,19 +2,20 @@ package eu.senla.eBookStore.bookStore;
 
 import eu.senla.eBookStore.bookWarehouse.BookWarehouse;
 import eu.senla.eBookStore.book.Book;
-import eu.senla.eBookStore.manager.Manager;
 import eu.senla.eBookStore.order.Order;
 import eu.senla.eBookStore.order.OrderStatus;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class BookStore {
     private static BookStore bookStore;
-    private List<Order> orderList;
-    private List<Manager> managerList;
-    private BookWarehouse bookWarehouse;
+    private final List<Order> orderList;
+    private final Map<Integer, Order> mapOfOrderAndId;
+    private final BookWarehouse bookWarehouse;
 
     public static BookStore getBookStore(){
         if (bookStore == null) {
@@ -25,11 +26,16 @@ public class BookStore {
 
     private BookStore () {
         this.orderList = new ArrayList<>();
+        this.mapOfOrderAndId = new HashMap<>();
         this.bookWarehouse = BookWarehouse.getBookWarehouse();
     }
 
     public List<Order> getOrderList() {
         return orderList;
+    }
+
+    public Map<Integer, Order> getMapOfOrderAndId() {
+        return mapOfOrderAndId;
     }
 
     public void writeOffTheBook(Book book, int numberOfBooksToWriteOff) {
@@ -42,15 +48,11 @@ public class BookStore {
         System.out.println("*add* The book (" + book.getTitle() + ") was add in warehouse in the amount of " + numberOfBooks + " pcs");
     }
 
-    public void showListOfBooks() {
-        bookWarehouse.showListOfBooks();
-    }
-
-    public Order createNewOrder(int orderId, Map<Book, Integer> orderMap) {
+    public void createNewOrder(int orderId, Map<Book, Integer> orderMap) {
         Order order = new Order(orderId, orderMap);
         orderList.add(order);
+        mapOfOrderAndId.put(orderId,order);
         if (order.isAbilityComplete()) completeOrder(order);
-        return order;
     }
 
     public void completeOrder(Order order) {
@@ -86,11 +88,6 @@ public class BookStore {
     public void createStoreRequest(Book book, int numberOfBooks) {
         System.out.println("*req* create new store request for book " + book.getTitle());
         book.setStoreRequest(book.getStoreRequest() + numberOfBooks);
-    }
-
-    public void lookBookDescription(Book book) {
-        System.out.println("Description of book " + book.getTitle() + ":");
-        System.out.println(book.getDescription());
     }
 
 }

@@ -3,24 +3,25 @@ package eu.senla.eBookStore.book;
 import java.time.LocalDate;
 
 public class Book {
-    private int bookId;
-    private String title;
-    private String author;
+    private final int bookId;
+    private final String title;
+    private final String author;
     private int price;
     private boolean status;
-    private int publicationYear;
+    private final int publicationYear;
     private String description;
     private int orderRequest;
     private int storeRequest;
     private LocalDate dateOfReceipt;
 
-    public Book(int bookId, String title, String author, int price, int publicationYear) {
+    public Book(int bookId, String title, String author, int price, int publicationYear, LocalDate dateOfReceipt) {
         this.bookId = bookId;
         this.title = title;
         this.author = author;
         this.price = price;
         this.publicationYear = publicationYear;
         this.orderRequest = 0;
+        this.dateOfReceipt = dateOfReceipt;
     }
 
     public String getDescription() {
@@ -33,10 +34,6 @@ public class Book {
 
     public LocalDate getDateOfReceipt() {
         return dateOfReceipt;
-    }
-
-    public void setDateOfReceipt(LocalDate dateOfReceipt) {
-        this.dateOfReceipt = dateOfReceipt;
     }
 
     public void setStoreRequest(int storeRequest) {
